@@ -6,18 +6,45 @@ import { signInWithPopup } from 'firebase/auth';
 import { Fingerprint,LogOut } from 'lucide-react';
 
 import { useTheme } from '../../Context/ThemeChanger/Theme';
+import { setDoc, doc} from 'firebase/firestore';
+import { db } from '../../firebaseconfig';
+import { UseUserData } from '../../Context/User/UserContext';
 
 
 
+async function CreateUser(authData) {
+  const user = authData.user;
+  const userData = {
+    name: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL,
+    uid: user.uid
+  };
 
-function Login({ setLogin }) {
+  await setDoc(doc(db, 'users', user.uid), userData);
+  console.log("Creating user data:", userData);
+
+  localStorage.setItem('user', JSON.stringify(userData));
+  console.log("User created successfully:", userData);
+}
+
+
+function Login() {
+
+  
+  const {userData, setUserData} = UseUserData();
   const navigate = useNavigate();
+  if(userData!= null){
+    navigate('/');
+    return <></>
+  }
   const { isDarkMode, handleThemeChange } = useTheme();
 
   const handleSignIn = async () => {
     const result = await signInWithPopup(auth, new GoogleAuthProvider);
+    await CreateUser(result);
+    setUserData(result.user);
     console.log(result);
-    setLogin(true);
     navigate('/');
   };
 

@@ -8,7 +8,7 @@ export function useTheme() {
 
 
  function ThemeProvider({ children }) {
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isDarkMode, setIsDarkMode] = React.useState(true);
 
   const handleThemeChange = () => {
     setIsDarkMode(!isDarkMode);

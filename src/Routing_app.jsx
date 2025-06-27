@@ -8,23 +8,23 @@ import PageNotFound from './Components/PageNotFound'
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute'
 
 function Routing_app() {
-  const [login, setLogin] = useState(false)
+ 
   return (
     <>
     <Routes>
-      <Route path='/' element={<ProtectedRoute isLogged={login} > <Home setLogin={setLogin}/> </ProtectedRoute>} />
+      <Route path='/' element={<ProtectedRoute  > <Home/> </ProtectedRoute>} />
 
-      <Route path='/chat/:uniqueID' element={     <ProtectedRoute isLogged={login}>
-        <Chat />
+      <Route path='/chat/:uniqueID' element={<ProtectedRoute >
+        <Home></Home>
       </ProtectedRoute>} />
 
-      <Route path='/profile' element={   <ProtectedRoute isLogged={login}>
+      <Route path='/profile' element={<ProtectedRoute >
         <Profile />
       </ProtectedRoute>} />
 
       <Route path='*' element={<PageNotFound />} />
 
-      <Route path='/login' element={<Login setLogin={setLogin} />} />
+      <Route path='/login' element={<Login/>} />
     </Routes>
       
     </>
