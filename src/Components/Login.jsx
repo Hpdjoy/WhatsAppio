@@ -8,7 +8,6 @@ import { Fingerprint,LogOut } from 'lucide-react';
 import { useTheme } from '../../Context/ThemeChanger/Theme';
 import { setDoc, doc} from 'firebase/firestore';
 import { db } from '../../firebaseconfig';
-import { UseUserData } from '../../Context/User/UserContext';
 
 
 
@@ -31,20 +30,13 @@ async function CreateUser(authData) {
 
 function Login() {
 
-  
-  const {userData, setUserData} = UseUserData();
+
   const navigate = useNavigate();
-  if(userData!= null){
-    navigate('/');
-    return <></>
-  }
   const { isDarkMode, handleThemeChange } = useTheme();
 
   const handleSignIn = async () => {
     const result = await signInWithPopup(auth, new GoogleAuthProvider);
     await CreateUser(result);
-    setUserData(result.user);
-    console.log(result);
     navigate('/');
   };
 

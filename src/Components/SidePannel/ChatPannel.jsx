@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../../firebaseconfig';
 import { Sun, MessageSquare, UserRound, Loader, Search, Moon } from 'lucide-react';
@@ -8,86 +7,85 @@ import { UseUserData } from '../../../Context/User/UserContext';
 import { useTheme } from '../../../Context/ThemeChanger/Theme';
 import RecentChats from './RecentChats';
 
-
 function ChatPannel() {
-      const [isloading, setIsLoading] = useState(true);
-      const [users, setUsers] = useState([]);
-      const [showProfile, setShowProfile] = useState(false);
-      
-      const {isDarkMode, handleThemeChange} = useTheme();
-      const { userData } = UseUserData();
+  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [showProfile, setShowProfile] = useState(false);
 
-      function handleShowProfile() {
-            // Function to handle showing the profile 
-            setShowProfile(true);
-            console.log("Profile button clicked");
+  const { isDarkMode, handleThemeChange } = useTheme();
+  const { userData } = UseUserData();
 
+  function handleShowProfile() {
+    setShowProfile(true);
+    console.log('Profile button clicked');
+  }
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getDocs(collection(db, 'users'));
+        const usersData = response.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setUsers(usersData);
+        console.log('Fetched users:', usersData);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
+    };
+    fetchUsers();
+  }, []);
 
-      useEffect(() => {
-            const fetchUsers = async () => {
-                  const response = await getDocs(collection(db, 'users'));
-                  const usersData = response.docs.map((doc) => doc.data());
-                  setUsers(usersData);
-                  console.log("Fetched users:", usersData);  // immediate log
-                  console.log("Number of users:", response.docs.length);  // correct
-                  setIsLoading(false);
-            };
-            fetchUsers();
-      }, []);
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center w-full h-screen'>
+        <Loader className='animate-spin text-[#04a784] h-10 w-10' />
+        <p className='text-[#04a784] ml-2'>Loading...</p>
+      </div>
+    );
+  }
 
+  if (showProfile) {
+    return <UserProfile setShowProfile={setShowProfile} />;
+  }
 
+  return (
+    <div className={`flex flex-col h-full w-[40%] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
+      {/* Header */}
+      <div className='flex items-center justify-between bg-[#eff2f5] text-black p-4'>
+        <button onClick={handleShowProfile}>
+          <img src={userData?.photoURL} alt='Profile' className='h-10 w-10 rounded-full' />
+        </button>
 
+        <div className='flex items-center gap-4'>
+          <button onClick={handleThemeChange}>
+            {isDarkMode ? <Sun /> : <Moon />}
+          </button>
+          <MessageSquare />
+          <UserRound />
+        </div>
+      </div>
 
-      if (isloading) {
-            return (
-                  <div className='flex items-center justify-center h-screen'>
-                        <Loader className='animate-spin text-[#04a784] h-10 w-10' />
-                        <p className='text-[#04a784]'>Loading...</p>
-                  </div>
-            )
-      }
-      if (showProfile == true) {
-            return (
-                  <UserProfile setShowProfile={setShowProfile} />
-            )
-      }
-      return (
-            <> 
-            <div className={`flex flex-col h-screen w-[30%] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
-                  <div className='flex items-center justify-between  bg-[#eff2f5] text-black p-4'>
-                        <button onClick={handleShowProfile}> <img src={userData.photoURL} alt="Hello" className='h-10 w-10 rounded-full' /></button>
+      {/* Search Bar */}
+      <div className='flex items-center bg-white w-full px-4 h-10 shadow-sm'>
+        <input
+          type='text'
+          placeholder='Search...'
+          className='w-full outline-none border-none'
+        />
+        <button>
+          <Search className='text-gray-500' />
+        </button>
+      </div>
 
-                        <div className='flex items-center gap-4 justify-between '>
-                             <button onClick={handleThemeChange}> {isDarkMode?<Sun />:<Moon />}</button>
-                              <MessageSquare />
-                              <UserRound />
-
-                        </div>
-                  </div>
-                  <div className="flex items-center bg-white w-full px-4 h-10 rounded-md shadow-sm">
-                        <input
-                              type="text"
-                              placeholder="Search..."
-                              className="w-full outline-none border-none focus:outline-none focus:border-none"
-                        />
-                        <button>
-                              <Search className="text-gray-500" />
-                        </button>
-                  </div>
-                  <div className='flex flex-col gap-4 p-4'>
-                        {users.map((user) => (
-                            <RecentChats userObject = {user} />
-                        ))}
-                  </div>
-            </div>
-            </>
-
-      );
-
-
-
+      {/* Recent Chats */}
+      <div className='flex flex-col gap-4 p-4 overflow-y-auto'>
+        {users.map((user) => (
+          <RecentChats key={user.id} userObject={user} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
-export default ChatPannel
+export default ChatPannel;
