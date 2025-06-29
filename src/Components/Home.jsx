@@ -1,53 +1,69 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebaseconfig';
-import { Storage } from '../../firebaseconfig';
-import { uploadBytesResumable, ref } from 'firebase/storage';
-import { getDownloadURL } from 'firebase/storage';
+import { auth, Storage } from '../../firebaseconfig';
+import { uploadBytesResumable, ref, getDownloadURL } from 'firebase/storage';
 import ChatPannel from './SidePannel/ChatPannel';
 import Chat from './Chat';
 import { UseUserData } from '../../Context/User/UserContext';
-
+import { useParams } from 'react-router-dom';
 
 function Home() {
-
   const { setUserData } = UseUserData();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { uniqueID } = useParams(); // Assume chat/:uniqueID is the route to open chat
 
   const handleChangeImage = (e) => {
     const image = e.target.files[0];
     const StorageRef = ref(Storage, `/images${image.name}`);
     const uploadTask = uploadBytesResumable(StorageRef, image);
-    uploadTask.on('state_changed', ProgressCB, errorCB, finishCB);
 
-    function ProgressCB(snapshot) {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log('Upload is ' + progress + '% done');
-    }
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+      },
+      (error) => {
+        console.error('Upload failed:', error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log('File available at', url);
+        });
+      }
+    );
+  };
 
-    function errorCB(error) {
-      console.error('Upload failed:', error);
-    }
+  // Watch screen size changes
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-    function finishCB() {
-      console.log('Upload completed successfully!');
-      getDownloadURL(uploadTask.snapshot.ref).then(function (url) {
-        console.log('File available at', url);
-      })
-    }
-
-  }
+  const isMobile = windowWidth < 768;
 
   return (
-    <>
-      <main className='w-full h-screen bg-[#e3e1db]'>
-        <div className='flex h-full w-full bg-[#eff2f5] shadow-md '>
-          <ChatPannel></ChatPannel>
-          <Chat></Chat>
-        </div>
+    <main className='w-full h-screen bg-[#e3e1db]'>
+      <div className='flex h-full w-full bg-[#eff2f5] shadow-md'>
 
-      </main>
-    </>
-  )
+        {/* Chat Panel */}
+        {(!isMobile || (isMobile && !uniqueID)) && (
+          <div className='w-full md:w-[30%]'>
+            <ChatPannel />
+          </div>
+        )}
+
+        {/* Chat Window */}
+        {(!isMobile || (isMobile && uniqueID)) && (
+          <div className='w-full md:w-[70%]'>
+            <Chat />
+          </div>
+        )}
+
+      </div>
+    </main>
+  );
 }
 
-export default Home
+export default Home;

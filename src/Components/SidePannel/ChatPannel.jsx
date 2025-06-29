@@ -60,7 +60,7 @@ function ChatPannel() {
   }
 
   return (
-    <div className={`flex flex-col h-full w-[40%] min-w-[300px] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-full md:w-[100%] min-w-[300px] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
       {/* Header */}
       <div className='flex items-center justify-between bg-[#eff2f5] text-black p-4'>
         <button onClick={handleShowProfile}>
