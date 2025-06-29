@@ -132,8 +132,15 @@ function Chat() {
     <div className="flex flex-col h-screen w-full bg-[#eff2f5]" key={chatUser?.uid}>
       <div className="p-4 border-b border-gray-300 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <img src={chatUser.photoURL} alt={chatUser.uid} className='h-10 w-10 rounded-full' />
+          <img src={chatUser.photoURL} alt={chatUser.uid} className='h-10 w-10 rounded-full  object-cover' />
+          <div className='flex flex-col'>
           <h1 className="text-lg font-semibold text-gray-700">{chatUser?.name}</h1>
+          {chatUser?.lastSeen && (
+            <p className='text-xs text-neutral-400'>
+              last seen at: {chatUser.lastSeen}
+            </p>
+          )}
+          </div>
         </div>
         <Phone />
       </div>

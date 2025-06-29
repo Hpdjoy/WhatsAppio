@@ -11,9 +11,19 @@ function ChatPannel() {
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [showProfile, setShowProfile] = useState(false);
+  const [seachQuery, setSeachQuery] = useState('');
 
   const { isDarkMode, handleThemeChange } = useTheme();
   const { userData } = UseUserData();
+
+
+  let filteredUsers = users;
+
+  if (seachQuery) {
+    filteredUsers = users.filter((user) =>
+      user.name.toLowerCase().startsWith(seachQuery.toLowerCase())
+    );
+  }
 
   function handleShowProfile() {
     setShowProfile(true);
@@ -50,11 +60,11 @@ function ChatPannel() {
   }
 
   return (
-    <div className={`flex flex-col h-full w-[40%] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-full w-[40%] min-w-[300px] bg-white shadow-lg ${isDarkMode ? 'dark' : ''}`}>
       {/* Header */}
       <div className='flex items-center justify-between bg-[#eff2f5] text-black p-4'>
         <button onClick={handleShowProfile}>
-          <img src={userData?.photoURL} alt='Profile' className='h-10 w-10 rounded-full' />
+          <img src={userData?.photoURL} alt='Profile' className='h-10 w-10 rounded-full  object-cover' />
         </button>
 
         <div className='flex items-center gap-4'>
@@ -71,6 +81,8 @@ function ChatPannel() {
         <input
           type='text'
           placeholder='Search...'
+          onChange={(e) => setSeachQuery(e.target.value)}
+          value = {seachQuery}
           className='w-full outline-none border-none'
         />
         <button>
@@ -80,7 +92,7 @@ function ChatPannel() {
 
       {/* Recent Chats */}
       <div className='flex flex-col gap-4 p-4 overflow-y-auto'>
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <RecentChats key={user.id} userObject={user} />
         ))}
       </div>

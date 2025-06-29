@@ -12,12 +12,21 @@ import { db } from '../../firebaseconfig';
 
 
 async function CreateUser(authData) {
+  const time = new Date();
+
+  const timestamp = time.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,})
+  
+
   const user = authData.user;
   const userData = {
     name: user.displayName,
     email: user.email,
     photoURL: user.photoURL,
-    uid: user.uid
+    uid: user.uid,
+    lastSeen : timestamp,
   };
 
   await setDoc(doc(db, 'users', user.uid), userData);
