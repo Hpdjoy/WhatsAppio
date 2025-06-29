@@ -3,7 +3,7 @@
 A responsive real-time chat application built with **React**, **Firebase Authentication**, **Cloud Firestore**, and **Firebase Storage**.
 
 ## Deployed Link
-`https://joychat-a7410.web.app/`
+(https://joychat-a7410.web.app/)
 
 
 ## 🔥 Features
