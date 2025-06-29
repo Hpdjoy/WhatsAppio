@@ -145,7 +145,7 @@ function Chat() {
         <Phone />
       </div>
 
-      <div className='flex flex-grow flex-col gap-4 p-6 bg-amber-300 overflow-y-auto'>
+      <div className='flex flex-grow flex-col gap-4 p-6 bg-[url(/background.jpg)] bg-cover overflow-y-auto'>
         {msgList.map((message, index) => (
           <div
             key={index}
